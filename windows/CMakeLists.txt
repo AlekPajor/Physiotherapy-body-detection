@@ -2,8 +2,8 @@
 cmake_minimum_required(VERSION 3.14)
 project(physiotherapy_body_detection LANGUAGES CXX)
 
-# The name of the executable created for the application. Change this to change
-# the on-disk name of your application.
+# The name of the executable created for the doctor. Change this to change
+# the on-disk name of your doctor.
 set(BINARY_NAME "physiotherapy_body_detection")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
@@ -54,7 +54,7 @@ add_subdirectory("runner")
 
 
 # Generated plugin build rules, which manage building the plugins and adding
-# them to the application.
+# them to the doctor.
 include(flutter/generated_plugins.cmake)
 
 

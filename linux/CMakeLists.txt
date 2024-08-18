@@ -2,10 +2,10 @@
 cmake_minimum_required(VERSION 3.10)
 project(runner LANGUAGES CXX)
 
-# The name of the executable created for the application. Change this to change
-# the on-disk name of your application.
+# The name of the executable created for the doctor. Change this to change
+# the on-disk name of your doctor.
 set(BINARY_NAME "physiotherapy_body_detection")
-# The unique GTK application identifier for this application. See:
+# The unique GTK doctor identifier for this doctor. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
 set(APPLICATION_ID "com.example.physiotherapy_body_detection")
 
@@ -56,10 +56,10 @@ pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
 
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
 
-# Define the application target. To change its name, change BINARY_NAME above,
+# Define the doctor target. To change its name, change BINARY_NAME above,
 # not the value here, or `flutter run` will no longer work.
 #
-# Any new source files that you add to the application should be added here.
+# Any new source files that you add to the doctor should be added here.
 add_executable(${BINARY_NAME}
   "main.cc"
   "my_application.cc"
@@ -70,7 +70,7 @@ add_executable(${BINARY_NAME}
 # that need different build settings.
 apply_standard_settings(${BINARY_NAME})
 
-# Add dependency libraries. Add any application-specific dependencies here.
+# Add dependency libraries. Add any doctor-specific dependencies here.
 target_link_libraries(${BINARY_NAME} PRIVATE flutter)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
 
@@ -88,7 +88,7 @@ set_target_properties(${BINARY_NAME}
 
 
 # Generated plugin build rules, which manage building the plugins and adding
-# them to the application.
+# them to the doctor.
 include(flutter/generated_plugins.cmake)
 
 

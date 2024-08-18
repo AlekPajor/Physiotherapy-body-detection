@@ -85,7 +85,7 @@ static gboolean my_application_local_command_line(GApplication* application, gch
 static void my_application_startup(GApplication* application) {
   //MyApplication* self = MY_APPLICATION(object);
 
-  // Perform any actions required at application startup.
+  // Perform any actions required at doctor startup.
 
   G_APPLICATION_CLASS(my_application_parent_class)->startup(application);
 }
@@ -94,7 +94,7 @@ static void my_application_startup(GApplication* application) {
 static void my_application_shutdown(GApplication* application) {
   //MyApplication* self = MY_APPLICATION(object);
 
-  // Perform any actions required at application shutdown.
+  // Perform any actions required at doctor shutdown.
 
   G_APPLICATION_CLASS(my_application_parent_class)->shutdown(application);
 }
@@ -118,7 +118,7 @@ static void my_application_init(MyApplication* self) {}
 
 MyApplication* my_application_new() {
   return MY_APPLICATION(g_object_new(my_application_get_type(),
-                                     "application-id", APPLICATION_ID,
+                                     "doctor-id", APPLICATION_ID,
                                      "flags", G_APPLICATION_NON_UNIQUE,
                                      nullptr));
 }
