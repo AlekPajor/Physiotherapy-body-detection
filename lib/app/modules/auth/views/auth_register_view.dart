@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -65,13 +64,41 @@ class AuthRegisterView extends GetView<AuthRegisterController> {
                             hintText: 'Enter password...'
                         ),
                         const SizedBox(height: 24),
+                        Obx(() => Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: RadioListTile<String>(
+                                activeColor: Colors.orange[900],
+                                title: Text('Patient'),
+                                value: 'Patient',
+                                groupValue: controller.registrationType.value,
+                                onChanged: (value) {
+                                  controller.registrationType.value = value!;
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: RadioListTile<String>(
+                                activeColor: Colors.orange[900],
+                                title: Text('Doctor'),
+                                value: 'Doctor',
+                                groupValue: controller.registrationType.value,
+                                onChanged: (value) {
+                                  controller.registrationType.value = value!;
+                                },
+                              ),
+                            ),
+                          ],
+                        )),
+                        const SizedBox(height: 24),
                         ElevatedButton(
                           style: ButtonStyle(
                             backgroundColor: WidgetStatePropertyAll(Colors.orange[900]),
                             foregroundColor: WidgetStatePropertyAll(Colors.grey[200]),
                             elevation: const WidgetStatePropertyAll(4)
                           ),
-                          onPressed: () => controller.registerPatient(),
+                          onPressed: () => controller.register(),
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

@@ -6,30 +6,23 @@ class AuthRegisterController extends GetxController {
   final lastNameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  var registrationType = 'Patient'.obs;
 
-  void registerPatient() {
+  void register() {
     final firstName = firstNameController.text;
     final lastName = lastNameController.text;
     final email = emailController.text;
     final password = passwordController.text;
 
     if (firstName.isNotEmpty && lastName.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
-      // Perform registration
-      Get.snackbar('Success', 'Registration as patient successful!');
-    } else {
-      Get.snackbar('Error', 'Please fill in all fields');
-    }
-  }
-
-  void registerDoctor() {
-    final firstName = firstNameController.text;
-    final lastName = lastNameController.text;
-    final email = emailController.text;
-    final password = passwordController.text;
-
-    if (firstName.isNotEmpty && lastName.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
-      // Perform registration
-      Get.snackbar('Success', 'Registration as doctor successful!');
+      if (registrationType.value == 'Patient') {
+        // register patient
+        Get.snackbar('Success', 'Registration as patient succeeded');
+      } else if (registrationType.value == 'Doctor') {
+        // register doctor
+        Get.snackbar('Success', 'Registration as doctor succeeded');
+      }
+      Get.offAllNamed('/login');
     } else {
       Get.snackbar('Error', 'Please fill in all fields');
     }
