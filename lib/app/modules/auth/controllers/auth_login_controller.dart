@@ -11,10 +11,10 @@ class AuthLoginController extends GetxController {
 
     if (email.isNotEmpty && password.isNotEmpty) {
 
-      var response = 'PATIENT';
+      var response = 'DOCTOR';
 
       if (response == 'DOCTOR') {
-        Get.offAllNamed('/doctor');
+        Get.offAllNamed('/my-patients');
       } else if (response == 'PATIENT') {
         Get.offAllNamed('/patient');
       } else {
