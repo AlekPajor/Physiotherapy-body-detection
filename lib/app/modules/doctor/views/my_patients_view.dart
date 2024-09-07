@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:core';
 import 'package:get/get.dart';
-import '../../../data/models/patient.dart';
+import 'package:physiotherapy_body_detection/app/data/models/patient.dart';
+import 'package:physiotherapy_body_detection/app/modules/doctor/views/patient_details_view.dart';
+import '../bindings/patient_details_binding.dart';
 import '../controllers/my_patients_controller.dart';
 
 class MyPatientsView extends GetView<MyPatientsController> {
@@ -76,7 +78,9 @@ class MyPatientsView extends GetView<MyPatientsController> {
                               Icons.arrow_forward_ios,
                               color: Colors.grey[900],
                             ),
-                            onTap: () {},
+                            onTap: () {
+                              Get.to(() => const PatientDetailsView(), arguments: patient, binding: PatientDetailsBinding());
+                            },
                             splashColor: Colors.transparent,
                           );
                         },
