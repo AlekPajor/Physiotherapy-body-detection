@@ -42,15 +42,19 @@ class AuthLoginView extends GetView<AuthLoginController> {
                         ),
                         const SizedBox(height: 24),
                         TextInputField(
+                          textColor: Colors.grey[900]!,
+                          color: Colors.grey[300]!,
                           controller: controller.emailController,
                           labelText: 'Email',
                           hintText: 'Enter email...'
                         ),
                         const SizedBox(height: 24),
                         TextInputField(
-                            controller: controller.passwordController,
-                            labelText: 'Password',
-                            hintText: 'Enter password...'
+                          textColor: Colors.grey[900]!,
+                          color: Colors.grey[300]!,
+                          controller: controller.passwordController,
+                          labelText: 'Password',
+                          hintText: 'Enter password...'
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton(

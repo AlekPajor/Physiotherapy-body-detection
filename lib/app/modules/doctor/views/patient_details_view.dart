@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:physiotherapy_body_detection/app/data/models/patient.dart';
+import 'package:physiotherapy_body_detection/app/modules/doctor/bindings/new_activity_binding.dart';
+import 'package:physiotherapy_body_detection/app/modules/doctor/views/new_activity_view.dart';
 import '../controllers/patient_details_controller.dart';
 
 class PatientDetailsView extends GetView<PatientDetailsController> {
@@ -51,6 +53,10 @@ class PatientDetailsView extends GetView<PatientDetailsController> {
                     Obx(() => Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
+                        side: BorderSide(
+                          color: Colors.orange[900]!,
+                          width: 3,
+                        ),
                       ),
                       elevation: 8,
                       color: Colors.grey[300],
@@ -94,7 +100,7 @@ class PatientDetailsView extends GetView<PatientDetailsController> {
                         elevation: const WidgetStatePropertyAll(4),
                       ),
                       onPressed: () {
-                        controller.changeActivity();
+                        Get.to(() => const NewActivityView(), arguments: patient, binding: NewActivityBinding());
                       },
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -140,6 +146,10 @@ class PatientDetailsView extends GetView<PatientDetailsController> {
                             color: Colors.grey[800],
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15),
+                              side: BorderSide(
+                                color: Colors.grey[300]!,
+                                width: 2,
+                              ),
                             ),
                             child: ListTile(
                               title: Text(

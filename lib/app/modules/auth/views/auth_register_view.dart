@@ -41,27 +41,35 @@ class AuthRegisterView extends GetView<AuthRegisterController> {
                         ),
                         const SizedBox(height: 24),
                         TextInputField(
+                          textColor: Colors.grey[900]!,
+                          color: Colors.grey[300]!,
                           controller: controller.firstNameController,
                           labelText: 'First name',
                           hintText: 'Enter first name...'
                         ),
                         const SizedBox(height: 24),
                         TextInputField(
+                          textColor: Colors.grey[900]!,
+                          color: Colors.grey[300]!,
                           controller: controller.lastNameController,
                           labelText: 'Last name',
                           hintText: 'Enter last name...'
                         ),
                         const SizedBox(height: 24),
                         TextInputField(
-                            controller: controller.emailController,
-                            labelText: 'Email',
-                            hintText: 'Enter Email...'
+                          textColor: Colors.grey[900]!,
+                          color: Colors.grey[300]!,
+                          controller: controller.emailController,
+                          labelText: 'Email',
+                          hintText: 'Enter Email...'
                         ),
                         const SizedBox(height: 24),
                         TextInputField(
-                            controller: controller.passwordController,
-                            labelText: 'Password',
-                            hintText: 'Enter password...'
+                          textColor: Colors.grey[900]!,
+                          color: Colors.grey[300]!,
+                          controller: controller.passwordController,
+                          labelText: 'Password',
+                          hintText: 'Enter password...'
                         ),
                         const SizedBox(height: 24),
                         Obx(() => Row(

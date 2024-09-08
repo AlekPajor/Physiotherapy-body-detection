@@ -37,8 +37,4 @@ class PatientDetailsController extends GetxController {
     reports.value = dummyReports;
     currentActivity.value = activity;
   }
-
-  void changeActivity() {
-    // Add patient logic
-  }
 }
