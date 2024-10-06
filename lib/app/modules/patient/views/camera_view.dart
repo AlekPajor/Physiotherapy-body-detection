@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
-import '../controllers/patient_controller.dart';
+import '../controllers/camera_controller.dart';
 
-class PatientView extends GetView<PatientController> {
-  const PatientView({Key? key}) : super(key: key);
+class CameraView extends GetView<CameraController> {
+  const CameraView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('PatientView'),
+        title: const Text('CameraView'),
         centerTitle: true,
       ),
       body: const Center(
         child: Text(
-          'PatientView is working',
+          'CameraView is working',
           style: TextStyle(fontSize: 20),
         ),
       ),

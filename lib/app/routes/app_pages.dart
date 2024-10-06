@@ -5,13 +5,17 @@ import '../modules/auth/bindings/auth_register_binding.dart';
 import '../modules/auth/views/auth_login_view.dart';
 import '../modules/auth/views/auth_register_view.dart';
 import '../modules/doctor/bindings/my_patients_binding.dart';
-import '../modules/doctor/bindings/patient_details_binding.dart';
 import '../modules/doctor/bindings/new_activity_binding.dart';
-import '../modules/doctor/views/new_activity_view.dart';
+import '../modules/doctor/bindings/patient_details_binding.dart';
 import '../modules/doctor/views/my_patients_view.dart';
+import '../modules/doctor/views/new_activity_view.dart';
 import '../modules/doctor/views/patient_details_view.dart';
-import '../modules/patient/bindings/patient_binding.dart';
-import '../modules/patient/views/patient_view.dart';
+import '../modules/patient/bindings/home_binding.dart';
+import '../modules/patient/bindings/profile_binding.dart';
+import '../modules/patient/bindings/camera_binding.dart';
+import '../modules/patient/views/camera_view.dart';
+import '../modules/patient/views/home_view.dart';
+import '../modules/patient/views/profile_view.dart';
 
 part 'app_routes.dart';
 
@@ -32,9 +36,9 @@ class AppPages {
       binding: AuthRegisterBinding(),
     ),
     GetPage(
-      name: _Paths.PATIENT,
-      page: () => const PatientView(),
-      binding: PatientBinding(),
+      name: _Paths.PROFILE,
+      page: () => const ProfileView(),
+      binding: ProfileBinding(),
     ),
     GetPage(
       name: _Paths.MY_PATIENTS,
@@ -50,6 +54,16 @@ class AppPages {
       name: _Paths.NEW_ACTIVITY,
       page: () => const NewActivityView(),
       binding: NewActivityBinding(),
+    ),
+    GetPage(
+      name: _Paths.HOME,
+      page: () => HomeView(),
+      binding: HomeBinding(),
+    ),
+    GetPage(
+      name: _Paths.CAMERA,
+      page: () => const CameraView(),
+      binding: CameraBinding(),
     ),
   ];
 }

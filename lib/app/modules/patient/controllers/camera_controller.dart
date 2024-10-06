@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
-class PatientController extends GetxController {
-  //TODO: Implement PatientController
+class CameraController extends GetxController {
+  //TODO: Implement CameraController
 
   final count = 0.obs;
   @override
