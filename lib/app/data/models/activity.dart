@@ -4,6 +4,7 @@ class Activity {
   String duration;
   String startingTime;
   String period;
+  List<String>? snapshots;
 
   Activity({
     required this.id,

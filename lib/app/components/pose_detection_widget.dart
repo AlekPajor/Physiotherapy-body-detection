@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 
 import '../../../../../main.dart';
@@ -99,23 +100,25 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
     );
   }
 
+
   Widget _liveFeedBody() {
     if (_controller == null || !_controller!.value.isInitialized || !liveFeedStarted) {
       return Container(
         color: Colors.grey[900],
         child: Center(
-            child: CircularProgressIndicator(
-              color: Colors.orange[900],
-            )
+          child: CircularProgressIndicator(
+            color: Colors.orange[900],
+          ),
         ),
       );
     }
 
     final size = MediaQuery.of(context).size;
     var scale = size.aspectRatio * _controller!.value.aspectRatio;
+
     if (scale < 1) scale = 1 / scale;
 
-    return Container(
+    return Obx(() => Container(
       color: Colors.black,
       child: Stack(
         fit: StackFit.expand,
@@ -124,21 +127,20 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
             scale: scale,
             child: Center(
               child: _changingCameraLens
-                ? Center(child:
-                    Text(
+                ? Center(
+                    child: Text(
                       'Changing camera lens',
-                      style: TextStyle(
-                          color: Colors.grey[400]
-                      ),
+                      style: TextStyle(color: Colors.grey[400]),
                     ),
                   )
                 : CameraPreview(_controller!),
             ),
           ),
-          if (widget.customPaint != null) widget.customPaint!,
+          if (widget.cameraScreenController.customPaint.value != null)
+            widget.cameraScreenController.customPaint.value!,
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildDialog(BuildContext context) {
@@ -167,7 +169,7 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
                         'Start your activity',
-                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.grey[400]),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[400]),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -177,7 +179,7 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
                         Text(
                           widget.cameraScreenController.currentActivity.name,
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 14,
                             color: Colors.grey[400],
                           ),
                         ),
@@ -185,7 +187,7 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
                         Text(
                           '${widget.cameraScreenController.currentActivity.duration}min - ${widget.cameraScreenController.currentActivity.startingTime} - ${widget.cameraScreenController.currentActivity.period} days',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 14,
                             color: Colors.grey[400],
                           ),
                         ),
@@ -194,8 +196,8 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
                     const SizedBox(height: 40),
                     ElevatedButton(
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.orange[900]),
-                        foregroundColor: MaterialStateProperty.all(Colors.grey[400]),
+                        backgroundColor: WidgetStatePropertyAll(Colors.orange[900]),
+                        foregroundColor: WidgetStatePropertyAll(Colors.grey[400]),
                       ),
                       onPressed: () {
                         _startCountdown();
@@ -295,8 +297,7 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
     }
     final bytes = allBytes.done().buffer.asUint8List();
 
-    final Size imageSize =
-    Size(image.width.toDouble(), image.height.toDouble());
+    final Size imageSize = Size(image.width.toDouble(), image.height.toDouble());
 
     final camera = cameras[_cameraIndex.toInt()];
     final imageRotation =
@@ -324,9 +325,11 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
       planeData: planeData,
     );
 
-    final inputImage =
-    InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+    final inputImage = InputImage.fromBytes(
+        bytes: bytes,
+        inputImageData: inputImageData
+    );
 
-    widget.onImage(inputImage);
+    await widget.cameraScreenController.processImage(inputImage);
   }
 }

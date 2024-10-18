@@ -12,7 +12,7 @@ class CameraScreenController extends GetxController {
   PoseDetector(options: PoseDetectorOptions());
   bool _canProcess = true;
   bool _isBusy = false;
-  CustomPaint? customPaint;
+  Rx<CustomPaint?> customPaint = Rx<CustomPaint?>(null);
   String? text;
   late Activity currentActivity;
 
@@ -35,21 +35,23 @@ class CameraScreenController extends GetxController {
   }
 
   Future<void> processImage(InputImage inputImage) async {
-    if (!_canProcess) return;
-    if (_isBusy) return;
+    if (!_canProcess || _isBusy) return;
+
     _isBusy = true;
 
     final poses = await _poseDetector.processImage(inputImage);
     if (inputImage.inputImageData?.size != null &&
         inputImage.inputImageData?.imageRotation != null) {
-      final painter = PosePainter(poses, inputImage.inputImageData!.size,
-          inputImage.inputImageData!.imageRotation);
-      customPaint = CustomPaint(painter: painter);
+      final painter = PosePainter(
+        poses,
+        inputImage.inputImageData!.size,
+        inputImage.inputImageData!.imageRotation,
+      );
+      customPaint.value = CustomPaint(painter: painter);
     } else {
-      text = 'Poses found: ${poses.length}\n\n';
-      // TODO: set _customPaint to draw landmarks on top of image
-      customPaint = null;
+      customPaint.value = null;
     }
+
     _isBusy = false;
     update();
   }

@@ -11,7 +11,7 @@ class CameraView extends GetView<CameraScreenController> {
     return PoseDetectionWidget(
       cameraScreenController: controller,
       title: 'Pose Detector',
-      customPaint: controller.customPaint,
+      customPaint: controller.customPaint.value,
       text: controller.text,
       onImage: (inputImage) {
         controller.processImage(inputImage);
