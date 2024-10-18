@@ -15,7 +15,8 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchPatientDetails();
+    currentActivity.value = userController.user.value!.currentActivity;
+    fetchReports();
   }
 
   void playVideo() {
@@ -35,16 +36,8 @@ class ProfileController extends GetxController {
     }
   }
 
-  void fetchPatientDetails() async {
+  void fetchReports() async {
     await Future.delayed(const Duration(seconds: 4));
-
-    final activity = Activity(
-        id: '1',
-        name: 'Push-ups',
-        duration: '30',
-        startingTime: '16:00',
-        period: '30'
-    );
 
     final List<Report> dummyReports = [
       Report(id: '1', activityName: 'Squats', date: '27.08', time: '16:01', correctness: '98%'),
@@ -57,6 +50,5 @@ class ProfileController extends GetxController {
     ];
 
     reports.value = dummyReports;
-    currentActivity.value = activity;
   }
 }

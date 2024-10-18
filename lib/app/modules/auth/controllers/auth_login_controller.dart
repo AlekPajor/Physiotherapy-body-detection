@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:physiotherapy_body_detection/app/data/models/user.dart';
 
+import '../../../data/models/activity.dart';
 import '../../../user_controller.dart';
 
 class AuthLoginController extends GetxController {
@@ -22,6 +23,13 @@ class AuthLoginController extends GetxController {
         Get.offAllNamed('/my-patients');
       } else if (response == 'PATIENT') {
         userController.setUser(User(id: '1', firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com'));
+        userController.user.value?.currentActivity = Activity(
+            id: '1',
+            name: 'Push-ups',
+            duration: '30',
+            startingTime: '16:00',
+            period: '30'
+        );
         Get.offAllNamed('/home');
       } else {
         Get.snackbar('Error', 'Something went wrong');

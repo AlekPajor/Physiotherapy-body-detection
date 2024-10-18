@@ -3,18 +3,23 @@ import 'package:get/get.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
 import '../../../components/pose_painter.dart';
+import '../../../data/models/activity.dart';
+import '../../../user_controller.dart';
 
-class CameraController extends GetxController {
+class CameraScreenController extends GetxController {
+  UserController userController = Get.find<UserController>();
   final PoseDetector _poseDetector =
   PoseDetector(options: PoseDetectorOptions());
   bool _canProcess = true;
   bool _isBusy = false;
   CustomPaint? customPaint;
   String? text;
+  late Activity currentActivity;
 
   @override
   void onInit() {
     super.onInit();
+    currentActivity = userController.user.value!.currentActivity!;
   }
 
   @override

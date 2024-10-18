@@ -52,12 +52,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 aspectRatio: _controller.value.aspectRatio,
                 child: VideoPlayer(_controller),
               ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  iconSize: 40,
+                  iconSize: 30,
                   icon: const Icon(Icons.close, color: Colors.white),
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -65,7 +65,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 ),
                 const SizedBox(width: 30),
                 IconButton(
-                  iconSize: 50,
+                  iconSize: 40,
                   icon: Icon(
                     _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
                     color: Colors.white,
@@ -82,7 +82,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 ),
                 const SizedBox(width: 30),
                 IconButton(
-                  iconSize: 40,
+                  iconSize: 30,
                   icon: const Icon(Icons.replay_5, color: Colors.white),
                   onPressed: () {
                     final currentPosition = _controller.value.position;

@@ -1,8 +1,12 @@
+import 'activity.dart';
+
 class User {
   String id;
   String firstName;
   String lastName;
   String email;
+  String? role;
+  Activity? currentActivity;
 
   User({
     required this.id,

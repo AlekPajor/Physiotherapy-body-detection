@@ -3,11 +3,9 @@ import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../../../../main.dart';
-
-enum ScreenMode { liveFeed, gallery }
+import '../modules/patient/controllers/camera_controller.dart';
 
 class PoseDetectionWidget extends StatefulWidget {
   const PoseDetectionWidget(
@@ -16,41 +14,36 @@ class PoseDetectionWidget extends StatefulWidget {
         required this.customPaint,
         this.text,
         required this.onImage,
-        this.onScreenModeChanged,
-        this.initialDirection = CameraLensDirection.back});
+        this.initialDirection = CameraLensDirection.back,
+        required this.cameraScreenController});
 
   final String title;
   final CustomPaint? customPaint;
   final String? text;
   final Function(InputImage inputImage) onImage;
-  final Function(ScreenMode mode)? onScreenModeChanged;
   final CameraLensDirection initialDirection;
+  final CameraScreenController cameraScreenController;
 
   @override
   _PoseDetectionWidgetState createState() => _PoseDetectionWidgetState();
 }
 
 class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
-  ScreenMode _mode = ScreenMode.liveFeed;
+  bool liveFeedStarted = false;
   CameraController? _controller;
-  File? _image;
-  String? _path;
-  ImagePicker? _imagePicker;
   num _cameraIndex = 0;
   double zoomLevel = 0.0, minZoomLevel = 0.0, maxZoomLevel = 0.0;
-  final bool _allowPicker = true;
   bool _changingCameraLens = false;
+  bool _showCustomDialog = true;
+  int _countdown = 0;  // For the countdown
+  bool _countdownStarted = false;
 
   @override
   void initState() {
     super.initState();
 
-    _imagePicker = ImagePicker();
-
-    if (cameras.any(
-          (element) =>
-      element.lensDirection == widget.initialDirection &&
-          element.sensorOrientation == 90,
+    if (cameras.any((element) =>
+    element.lensDirection == widget.initialDirection && element.sensorOrientation == 90,
     )) {
       _cameraIndex = cameras.indexOf(
         cameras.firstWhere((element) =>
@@ -58,10 +51,8 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
             element.sensorOrientation == 90),
       );
     } else {
-      _cameraIndex = cameras.indexOf(
-        cameras.firstWhere(
-              (element) => element.lensDirection == widget.initialDirection,
-        ),
+      _cameraIndex = cameras.indexOf(cameras.firstWhere(
+              (element) => element.lensDirection == widget.initialDirection),
       );
     }
 
@@ -77,71 +68,51 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: [
-          if (_allowPicker)
-            Padding(
-              padding: const EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: _switchScreenMode,
-                child: Icon(
-                  _mode == ScreenMode.liveFeed
-                      ? Icons.photo_library_outlined
-                      : (Platform.isIOS
-                      ? Icons.camera_alt_outlined
-                      : Icons.camera),
-                ),
-              ),
-            ),
+      floatingActionButton: _floatingActionButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          _liveFeedBody(),
+          if (_showCustomDialog) _buildDialog(context),
         ],
       ),
-      body: _body(),
-      floatingActionButton: _floatingActionButton(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
   Widget? _floatingActionButton() {
-    if (_mode == ScreenMode.gallery) return null;
     if (cameras.length == 1) return null;
     return SizedBox(
-        height: 70.0,
-        width: 70.0,
+        height: 50.0,
+        width: 50.0,
         child: FloatingActionButton(
+          backgroundColor: Colors.grey[900],
           onPressed: _switchLiveCamera,
           child: Icon(
             Platform.isIOS
                 ? Icons.flip_camera_ios_outlined
                 : Icons.flip_camera_android_outlined,
             size: 40,
+            color: Colors.orange[900],
           ),
-        ));
-  }
-
-  Widget _body() {
-    Widget body;
-    if (_mode == ScreenMode.liveFeed) {
-      body = _liveFeedBody();
-    } else {
-      body = _galleryBody();
-    }
-    return body;
+        )
+    );
   }
 
   Widget _liveFeedBody() {
-    if (_controller?.value.isInitialized == false) {
-      return Container();
+    if (_controller == null || !_controller!.value.isInitialized || !liveFeedStarted) {
+      return Container(
+        color: Colors.grey[900],
+        child: Center(
+            child: CircularProgressIndicator(
+              color: Colors.orange[900],
+            )
+        ),
+      );
     }
 
     final size = MediaQuery.of(context).size;
-    // calculate scale depending on screen and camera ratios
-    // this is actually size.aspectRatio / (1 / camera.aspectRatio)
-    // because camera preview size is received as landscape
-    // but we're calculating for portrait orientation
     var scale = size.aspectRatio * _controller!.value.aspectRatio;
-
-    // to prevent scaling down, invert the value
     if (scale < 1) scale = 1 / scale;
 
     return Container(
@@ -153,101 +124,128 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
             scale: scale,
             child: Center(
               child: _changingCameraLens
-                ? const Center(child: Text('Changing camera lens'),)
+                ? Center(child:
+                    Text(
+                      'Changing camera lens',
+                      style: TextStyle(
+                          color: Colors.grey[400]
+                      ),
+                    ),
+                  )
                 : CameraPreview(_controller!),
             ),
           ),
           if (widget.customPaint != null) widget.customPaint!,
-          Positioned(
-            bottom: 100,
-            left: 50,
-            right: 50,
-            child: Slider(
-              value: zoomLevel,
-              min: minZoomLevel,
-              max: maxZoomLevel,
-              onChanged: (newSliderValue) {
-                setState(() {
-                  zoomLevel = newSliderValue;
-                  _controller!.setZoomLevel(zoomLevel);
-                });
-              },
-              divisions: (maxZoomLevel - 1).toInt() < 1
-                  ? null
-                  : (maxZoomLevel - 1).toInt(),
-            ),
-          )
         ],
       ),
     );
   }
 
-  Widget _galleryBody() {
-    return ListView(shrinkWrap: true, children: [
-      _image != null
-      ? SizedBox(
-          height: 400,
-          width: 400,
-          child: Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              Image.file(_image!),
-              if (widget.customPaint != null) widget.customPaint!,
-            ],
+  Widget _buildDialog(BuildContext context) {
+    return IgnorePointer(
+      ignoring: false,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.8,
+              child: Container(color: Colors.black),
+            ),
           ),
-        )
-      : const Icon(
-          Icons.image,
-          size: 200,
-        ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ElevatedButton(
-          child: const Text('From Gallery'),
-          onPressed: () => _getImage(ImageSource.gallery),
-        ),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.grey[900],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!_countdownStarted) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: Text(
+                        'Start your activity',
+                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.grey[400]),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.cameraScreenController.currentActivity.name,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          '${widget.cameraScreenController.currentActivity.duration}min - ${widget.cameraScreenController.currentActivity.startingTime} - ${widget.cameraScreenController.currentActivity.period} days',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 40),
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.orange[900]),
+                        foregroundColor: MaterialStateProperty.all(Colors.grey[400]),
+                      ),
+                      onPressed: () {
+                        _startCountdown();
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 40),
+                        child: Text(
+                          'Start',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ] else ...[
+                    Text(
+                      'Starting in $_countdown',
+                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.grey[400]),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ElevatedButton(
-          child: const Text('Take a picture'),
-          onPressed: () => _getImage(ImageSource.camera),
-        ),
-      ),
-      if (_image != null)
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-              '${_path == null ? '' : 'Image path: $_path'}\n\n${widget.text ?? ''}'),
-        ),
-    ]);
+    );
   }
 
-  Future _getImage(ImageSource source) async {
+  void _startCountdown() {
     setState(() {
-      _image = null;
-      _path = null;
+      _countdown = 5;
+      _countdownStarted = true;
     });
-    final pickedFile = await _imagePicker?.pickImage(source: source);
-    if (pickedFile != null) {
-      _processPickedFile(pickedFile);
-    }
-    setState(() {});
-  }
 
-  void _switchScreenMode() {
-    _image = null;
-    if (_mode == ScreenMode.liveFeed) {
-      _mode = ScreenMode.gallery;
-      _stopLiveFeed();
-    } else {
-      _mode = ScreenMode.liveFeed;
-      _startLiveFeed();
-    }
-    if (widget.onScreenModeChanged != null) {
-      widget.onScreenModeChanged!(_mode);
-    }
-    setState(() {});
+    Future.doWhile(() async {
+      if (_countdown > 0) {
+        await Future.delayed(const Duration(seconds: 1));
+        setState(() {
+          _countdown--;
+        });
+        return true;
+      } else {
+        setState(() {
+          _showCustomDialog = false;
+        });
+        return false;
+      }
+    });
   }
 
   Future _startLiveFeed() async {
@@ -272,6 +270,7 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
       _controller?.startImageStream(_processCameraImage);
       setState(() {});
     });
+    liveFeedStarted = true;
   }
 
   Future _stopLiveFeed() async {
@@ -287,19 +286,6 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
     await _stopLiveFeed();
     await _startLiveFeed();
     setState(() => _changingCameraLens = false);
-  }
-
-  Future _processPickedFile(XFile? pickedFile) async {
-    final path = pickedFile?.path;
-    if (path == null) {
-      return;
-    }
-    setState(() {
-      _image = File(path);
-    });
-    _path = path;
-    final inputImage = InputImage.fromFilePath(path);
-    widget.onImage(inputImage);
   }
 
   Future _processCameraImage(CameraImage image) async {
