@@ -78,22 +78,22 @@ class AuthRegisterView extends GetView<AuthRegisterController> {
                             Expanded(
                               child: RadioListTile<String>(
                                 activeColor: Colors.orange[900],
-                                title: Text('Patient'),
+                                title: const Text('Patient', style: TextStyle(fontSize: 14),),
                                 value: 'Patient',
-                                groupValue: controller.registrationType.value,
+                                groupValue: controller.role.value,
                                 onChanged: (value) {
-                                  controller.registrationType.value = value!;
+                                  controller.role.value = value!;
                                 },
                               ),
                             ),
                             Expanded(
                               child: RadioListTile<String>(
                                 activeColor: Colors.orange[900],
-                                title: Text('Doctor'),
+                                title: Text('Doctor', style: TextStyle(fontSize: 14),),
                                 value: 'Doctor',
-                                groupValue: controller.registrationType.value,
+                                groupValue: controller.role.value,
                                 onChanged: (value) {
-                                  controller.registrationType.value = value!;
+                                  controller.role.value = value!;
                                 },
                               ),
                             ),
@@ -110,12 +110,12 @@ class AuthRegisterView extends GetView<AuthRegisterController> {
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.check_box),
+                              Icon(Icons.check_box, size: 16,),
                               SizedBox(width: 6,),
                               Text(
                                 'Register',
                                 style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w800
                                 ),
                               ),

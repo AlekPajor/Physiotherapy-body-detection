@@ -27,7 +27,7 @@ class NewActivityView extends GetView<NewActivityController> {
                 child: Text(
                   'Assign new activity',
                   style: TextStyle(
-                    fontSize: 36,
+                    fontSize: 26,
                     fontWeight: FontWeight.w700,
                     color: Colors.grey[300],
                   ),
@@ -45,7 +45,7 @@ class NewActivityView extends GetView<NewActivityController> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Obx(() {
-                      if (controller.activities.isEmpty) {
+                      if (controller.exercises.isEmpty) {
                         return Center(
                           child: CircularProgressIndicator(
                             color: Colors.orange[900],
@@ -53,19 +53,19 @@ class NewActivityView extends GetView<NewActivityController> {
                         );
                       }
                       return ListView.builder(
-                        itemCount: controller.activities.length,
+                        itemCount: controller.exercises.length,
                         itemBuilder: (context, index) {
-                          final activity = controller.activities[index];
+                          final exercise = controller.exercises[index];
                           return ListTile(
                             leading: CircleAvatar(
                               backgroundColor: Colors.orange[900],
                               child: Text(
-                                activity.name[0],
+                                exercise.name[0],
                                 style: const TextStyle(color: Colors.white),
                               ),
                             ),
                             title: Text(
-                              activity.name,
+                              exercise.name,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey[900],
@@ -73,14 +73,14 @@ class NewActivityView extends GetView<NewActivityController> {
                             ),
                             trailing: Obx(() {
                               return Icon(
-                                controller.checkedActivity.value.id == activity.id
+                                controller.checkedExercise.value?.id == exercise.id
                                     ? Icons.check_box_outlined
                                     : Icons.check_box_outline_blank,
                                 color: Colors.grey[900],
                               );
                             }),
                             onTap: () {
-                              controller.setActivity(activity);
+                              controller.setExercise(exercise);
                             },
                             splashColor: Colors.transparent,
                           );
@@ -197,6 +197,7 @@ class NewActivityView extends GetView<NewActivityController> {
                   ],
                 ),
               ),
+              const SizedBox(height: 20,)
             ]
           )
         )

@@ -66,12 +66,14 @@ class MyPatientsView extends GetView<MyPatientsController> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey[900],
+                                fontSize: 16
                               ),
                             ),
                             subtitle: Text(
                               patient.email,
                               style: TextStyle(
                                 color: Colors.grey[700],
+                                fontSize: 10
                               ),
                             ),
                             trailing: Icon(

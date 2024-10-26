@@ -1,18 +1,24 @@
 import 'activity.dart';
 
 class User {
-  String id;
+  int? id;
   String firstName;
   String lastName;
   String email;
+  String password;
+  int? doctorId;
   String? role;
   Activity? currentActivity;
 
   User({
-    required this.id,
+    this.id,
     required this.firstName,
     required this.lastName,
     required this.email,
+    required this.password,
+    this.currentActivity,
+    this.doctorId,
+    this.role
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -21,6 +27,10 @@ class User {
       firstName: json['firstName'],
       lastName: json['lastName'],
       email: json['email'],
+      password: json['password'],
+      doctorId: json['doctorId'],
+      role: json['role'],
+      currentActivity: json['currentActivity']
     );
   }
 

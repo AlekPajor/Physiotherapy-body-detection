@@ -67,12 +67,12 @@ class AuthLoginView extends GetView<AuthLoginController> {
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.login_rounded),
+                              Icon(Icons.login_rounded, size: 16,),
                               SizedBox(width: 6,),
                               Text(
                                 'Login',
                                 style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w800
                                 ),
                               ),
@@ -85,14 +85,14 @@ class AuthLoginView extends GetView<AuthLoginController> {
                             TextSpan(
                               text: 'Don\'t have an account? ',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 12,
                                 color: Colors.grey[900]
                               ),
                               children: [
                                 TextSpan(
                                   text: 'Register',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 12,
                                     color: Colors.orange[900],
                                     decoration: TextDecoration.underline,
                                   ),

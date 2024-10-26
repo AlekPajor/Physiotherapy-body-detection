@@ -62,7 +62,7 @@ class PatientDetailsView extends GetView<PatientDetailsController> {
                       color: Colors.grey[300],
                       child: Padding(
                         padding: const EdgeInsets.all(20.0),
-                        child: controller.currentActivity.value.name.isEmpty
+                        child: controller.currentActivity == null
                           ? Center(
                               child: CircularProgressIndicator(
                                 color: Colors.orange[900],
@@ -72,7 +72,7 @@ class PatientDetailsView extends GetView<PatientDetailsController> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 Text(
-                                  controller.currentActivity.value.name,
+                                  controller.currentActivity!.exercise.name,
                                   style: TextStyle(
                                     fontSize: 26,
                                     fontWeight: FontWeight.w700,
@@ -81,7 +81,7 @@ class PatientDetailsView extends GetView<PatientDetailsController> {
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
-                                  '${controller.currentActivity.value.duration}min - ${controller.currentActivity.value.startingTime} - ${controller.currentActivity.value.period} days',
+                                  '${controller.currentActivity?.duration}sec - ${controller.currentActivity?.startingTime} - ${controller.currentActivity?.period} days',
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.grey[900],
@@ -153,7 +153,7 @@ class PatientDetailsView extends GetView<PatientDetailsController> {
                             ),
                             child: ListTile(
                               title: Text(
-                                '${report.activityName} - ${report.correctness}',
+                                '${report.exercise.name} - ${report.correctness}',
                                 style: TextStyle(color: Colors.grey[300]),
                               ),
                               subtitle: Text(

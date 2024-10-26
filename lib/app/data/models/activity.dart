@@ -1,14 +1,15 @@
+import 'package:physiotherapy_body_detection/app/data/models/exercise.dart';
+
 class Activity {
-  String id;
-  String name;
+  int? id;
+  Exercise exercise;
   String duration;
   String startingTime;
   String period;
-  List<String>? snapshots;
 
   Activity({
-    required this.id,
-    required this.name,
+    this.id,
+    required this.exercise,
     required this.duration,
     required this.startingTime,
     required this.period,
@@ -17,7 +18,7 @@ class Activity {
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
       id: json['id'],
-      name: json['name'],
+      exercise: json['exercise'],
       duration: json['duration'],
       startingTime: json['startingTime'],
       period: json['period'],
@@ -27,7 +28,7 @@ class Activity {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
+      'exercise': exercise,
       'duration': duration,
       'startingTime': startingTime,
       'period': period,
@@ -36,6 +37,6 @@ class Activity {
 
   @override
   String toString() {
-    return 'Activity(id: $id, name: $name, duration: $duration, startingTime: $startingTime, period:$period)';
+    return 'Activity(id: $id, exercise: $exercise, duration: $duration, startingTime: $startingTime, period:$period)';
   }
 }

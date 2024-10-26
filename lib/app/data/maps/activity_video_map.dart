@@ -1,4 +1,6 @@
 const Map<String, String> activityVideoMap = {
-  'Squats': 'assets/video1.mp4',
-  'Push-ups': 'assets/video2.mp4',
+  'Anterior body extension': 'assets/anterior_body_extension.mp4',
+  'Lateral hand extension': 'assets/lateral_hand_extensions.mp4',
+  'Anterior limb extension': 'assets/anterior_limb_extension.mp4',
+  'Example': 'assets/example.mp4',
 };

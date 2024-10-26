@@ -177,7 +177,7 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.cameraScreenController.currentActivity.name,
+                          widget.cameraScreenController.currentActivity.exercise.name,
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[400],

@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../user_controller.dart';
+
 class AuthRegisterController extends GetxController {
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  var registrationType = 'Patient'.obs;
+  final UserController userController = Get.find<UserController>();
+  var role = 'PATIENT'.obs;
 
-  void register() {
+  Future<void> register() async {
     final firstName = firstNameController.text;
     final lastName = lastNameController.text;
     final email = emailController.text;
     final password = passwordController.text;
+    final userRole = role.toString();
 
     if (firstName.isNotEmpty && lastName.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
-      if (registrationType.value == 'Patient') {
-        // register patient
-        Get.snackbar('Success', 'Registration as patient succeeded');
-      } else if (registrationType.value == 'Doctor') {
-        // register doctor
-        Get.snackbar('Success', 'Registration as doctor succeeded');
+      try {
+        await userController.register(email, password, firstName, lastName, userRole);
+        Get.toNamed('/login');
+      } catch(error) {
+        Get.snackbar('Error', '$error');
       }
-      Get.offAllNamed('/login');
     } else {
       Get.snackbar('Error', 'Please fill in all fields');
     }

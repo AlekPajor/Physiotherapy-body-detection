@@ -16,7 +16,7 @@ class TextInputField extends StatelessWidget {
       borderRadius: BorderRadius.circular(50.0),
       child: TextField(
         style: TextStyle(
-          fontSize: 18,
+          fontSize: 12,
           color: textColor,
         ),
         controller: controller,
@@ -42,16 +42,16 @@ class TextInputField extends StatelessWidget {
           contentPadding: const EdgeInsets.symmetric(horizontal: 17, vertical: 17),
           labelText: labelText,
           labelStyle: TextStyle(
-              fontSize: 16,
+              fontSize: 10,
               color: Colors.grey[600]
           ),
           floatingLabelStyle: TextStyle(
-              fontSize: 16,
+              fontSize: 12,
               color: Colors.orange[900]
           ),
           hintText: hintText,
           hintStyle: TextStyle(
-              fontSize: 16,
+              fontSize: 10,
               color: Colors.grey[400]
           ),
         ),

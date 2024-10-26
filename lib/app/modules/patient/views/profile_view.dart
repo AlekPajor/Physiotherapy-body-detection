@@ -64,7 +64,7 @@ class ProfileView extends GetView<ProfileController> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              controller.currentActivity.value!.name,
+                              controller.currentActivity.value!.exercise.name,
                               style: TextStyle(
                                 fontSize: 26,
                                 fontWeight: FontWeight.w700,
@@ -155,7 +155,7 @@ class ProfileView extends GetView<ProfileController> {
                             ),
                             child: ListTile(
                               title: Text(
-                                '${report.activityName} - ${report.correctness}',
+                                '${report.exercise.name} - ${report.correctness}',
                                 style: TextStyle(color: Colors.grey[300]),
                               ),
                               subtitle: Text(
