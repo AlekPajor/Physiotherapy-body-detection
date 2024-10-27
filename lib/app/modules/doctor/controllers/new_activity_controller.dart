@@ -51,6 +51,7 @@ class NewActivityController extends GetxController {
             startingTimeController.text,
             periodController.text
         );
+        Get.find<PatientDetailsController>().fetchPatientDetails();
         Get.back();
       } catch (error) {
         Get.snackbar('Error', '$error');

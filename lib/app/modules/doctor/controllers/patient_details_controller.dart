@@ -35,8 +35,9 @@ class PatientDetailsController extends GetxController {
 
   Future<void> fetchPatientDetails() async {
     try {
-      patient.value = await httpController.fetchPatientDetails(patient.value!.id!);
-      update();
+      var fetchedPatient = await httpController.fetchPatientDetails(patient.value!.id!);
+      patient.value = fetchedPatient;
+      currentActivity.value = fetchedPatient.currentActivity;
     } catch (error) {
       print('Error: $error');
     }
