@@ -12,7 +12,7 @@ class NewActivityView extends GetView<NewActivityController> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    final cardHeight = screenHeight * 0.37;
+    final cardHeight = screenHeight * 0.3;
 
     return Scaffold(
       backgroundColor: Colors.grey[900],
@@ -45,7 +45,7 @@ class NewActivityView extends GetView<NewActivityController> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Obx(() {
-                      if (controller.exercises.isEmpty) {
+                      if (controller.isLoading.value) {
                         return Center(
                           child: CircularProgressIndicator(
                             color: Colors.orange[900],
@@ -90,7 +90,7 @@ class NewActivityView extends GetView<NewActivityController> {
                   ),
                 ),
               ),
-              const SizedBox(height: 40,),
+              const SizedBox(height: 70,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -107,9 +107,9 @@ class NewActivityView extends GetView<NewActivityController> {
                   SizedBox(
                     width: 70,
                     child: Text(
-                      'min',
+                      'sec',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: Colors.grey[300],
                       ),
@@ -136,7 +136,7 @@ class NewActivityView extends GetView<NewActivityController> {
                     child: Text(
                       'hour',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: Colors.grey[300],
                       ),
@@ -163,7 +163,7 @@ class NewActivityView extends GetView<NewActivityController> {
                     child: Text(
                       'days',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: Colors.grey[300],
                       ),
@@ -190,7 +190,7 @@ class NewActivityView extends GetView<NewActivityController> {
                     Text(
                       'ASSIGN',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 14,
                         fontWeight: FontWeight.w800,
                       ),
                     ),

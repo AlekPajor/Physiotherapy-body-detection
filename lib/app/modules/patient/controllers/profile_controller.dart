@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:physiotherapy_body_detection/app/http_controller.dart';
 
 import '../../../components/video_player_widget.dart';
 import '../../../data/maps/activity_video_map.dart';
@@ -8,15 +9,17 @@ import '../../../data/models/report.dart';
 import '../../../user_controller.dart';
 
 class ProfileController extends GetxController {
+  final HttpController httpController = Get.put(HttpController());
   final UserController userController = Get.find<UserController>();
   var reports = <Report>[].obs;
   var currentActivity = Rxn<Activity>();
+  var isLoading = false.obs;
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
-    currentActivity.value = userController.user.value!.currentActivity;
-    fetchReports();
+    currentActivity.value = userController.user.value?.currentActivity;
+    await fetchReports();
   }
 
   void playVideo() {
@@ -36,7 +39,9 @@ class ProfileController extends GetxController {
     }
   }
 
-  void fetchReports() async {
-    // get all reports
+  Future<void> fetchReports() async {
+    isLoading.value = true;
+    reports.value = await httpController.fetchReportsByUserId(userController.user.value!.id!);
+    isLoading.value = false;
   }
 }

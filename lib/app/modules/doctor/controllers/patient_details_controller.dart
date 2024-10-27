@@ -2,20 +2,43 @@ import 'package:get/get.dart';
 import 'package:physiotherapy_body_detection/app/data/models/activity.dart';
 import 'package:physiotherapy_body_detection/app/data/models/report.dart';
 
+import '../../../data/models/patient.dart';
+import '../../../http_controller.dart';
 import '../../../user_controller.dart';
 
 class PatientDetailsController extends GetxController {
-
+  final HttpController httpController = Get.put(HttpController());
   var reports = <Report>[].obs;
-  var currentActivity = Get.find<UserController>().user.value?.currentActivity;
+  var currentActivity = Rxn<Activity>();
+  var isLoading = false.obs;
+  var patient = Rxn<Patient>(null);
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
-    fetchPatientDetails();
+    patient.value = Get.arguments as Patient;
+    await fetchPatientDetails();
+    currentActivity.value = patient.value!.currentActivity;
+    await fetchPatientReports();
+  }
+
+  Future<void> fetchPatientReports() async {
+    isLoading.value = true;
+    try {
+      reports.value = await httpController.fetchReportsByUserId(patient.value!.id!);
+    } catch (error) {
+      print('Error: $error');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> fetchPatientDetails() async {
-    // get patient details
+    try {
+      patient.value = await httpController.fetchPatientDetails(patient.value!.id!);
+      update();
+    } catch (error) {
+      print('Error: $error');
+    }
   }
 }

@@ -18,7 +18,7 @@ class Activity {
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
       id: json['id'],
-      exercise: json['exercise'],
+      exercise: Exercise.fromJson(json['exercise']),
       duration: json['duration'],
       startingTime: json['startingTime'],
       period: json['period'],

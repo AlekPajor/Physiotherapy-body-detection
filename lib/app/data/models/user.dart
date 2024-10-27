@@ -30,7 +30,9 @@ class User {
       password: json['password'],
       doctorId: json['doctorId'],
       role: json['role'],
-      currentActivity: json['currentActivity']
+      currentActivity: json['currentActivity'] != null
+          ? Activity.fromJson(json['currentActivity'])
+          : null,
     );
   }
 

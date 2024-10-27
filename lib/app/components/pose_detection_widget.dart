@@ -161,7 +161,8 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
                 color: Colors.grey[900],
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Column(
+              child: widget.cameraScreenController.currentActivity.value != null
+              ? Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (!_countdownStarted) ...[
@@ -177,7 +178,7 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.cameraScreenController.currentActivity.exercise.name,
+                          widget.cameraScreenController.currentActivity.value!.exercise.name,
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[400],
@@ -185,7 +186,7 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          '${widget.cameraScreenController.currentActivity.duration}min - ${widget.cameraScreenController.currentActivity.startingTime} - ${widget.cameraScreenController.currentActivity.period} days',
+                          '${widget.cameraScreenController.currentActivity.value!.duration}min - ${widget.cameraScreenController.currentActivity.value!.startingTime} - ${widget.cameraScreenController.currentActivity.value!.period} days',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[400],
@@ -220,7 +221,22 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
                     ),
                   ],
                 ],
-              ),
+              )
+              : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: 80,
+                    width: 280,
+                    child: Center(
+                      child: Text(
+                        "No activity assigned",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[400]),
+                      ),
+                    ),
+                  ),
+                ],
+              )
             ),
           ),
         ],

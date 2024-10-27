@@ -36,6 +36,7 @@ class UserController extends GetxController {
       final responseUser = User.fromJson(data);
       user.value = responseUser;
     } else {
+      print('${response.statusCode}: ${response.body}');
       throw Exception('${response.statusCode}: ${response.body}');
     }
   }
@@ -61,6 +62,7 @@ class UserController extends GetxController {
     if (response.statusCode == 201) {
       return;
     } else {
+      print('${response.statusCode}: ${response.body}');
       throw Exception('${response.statusCode}: ${response.body}');
     }
   }

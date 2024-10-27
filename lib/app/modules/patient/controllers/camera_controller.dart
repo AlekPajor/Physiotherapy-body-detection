@@ -14,12 +14,12 @@ class CameraScreenController extends GetxController {
   bool _isBusy = false;
   Rx<CustomPaint?> customPaint = Rx<CustomPaint?>(null);
   String? text;
-  late Activity currentActivity;
+  var currentActivity = Rxn<Activity>();
 
   @override
   void onInit() {
     super.onInit();
-    currentActivity = userController.user.value!.currentActivity!;
+    currentActivity.value = userController.user.value?.currentActivity;
   }
 
   @override

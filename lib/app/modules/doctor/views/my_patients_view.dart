@@ -12,7 +12,7 @@ class MyPatientsView extends GetView<MyPatientsController> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final cardHeight = screenHeight * 0.5;
+    final cardHeight = screenHeight * 0.4;
 
     return Scaffold(
       backgroundColor: Colors.grey[900],
@@ -42,12 +42,24 @@ class MyPatientsView extends GetView<MyPatientsController> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Obx(() {
-                      if (controller.patients.isEmpty) {
+                      if (controller.isLoading.value) {
                         return Center(
                           child: CircularProgressIndicator(
                             color: Colors.orange[900],
                           ),
                         );
+                      } else {
+                        if(controller.patients.isEmpty) {
+                          return Center(
+                            child: Text(
+                              "No patients assigned",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[900]
+                              ),
+                            )
+                          );
+                        }
                       }
                       return ListView.builder(
                         itemCount: controller.patients.length,
@@ -92,12 +104,20 @@ class MyPatientsView extends GetView<MyPatientsController> {
                 ),
               ),
               const SizedBox(height: 60),
+              Text(
+                "Assign patient",
+                style: TextStyle(
+                  fontSize: 24,
+                  color: Colors.grey[300],
+                ),
+              ),
+              const SizedBox(height: 10),
               Material(
                 elevation: 4,
                 borderRadius: BorderRadius.circular(50.0),
                 child: TextField(
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     color: Colors.grey[400],
                   ),
                   controller: controller.emailController,
@@ -122,20 +142,19 @@ class MyPatientsView extends GetView<MyPatientsController> {
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 30,
-                      vertical: 17,
                     ),
                     labelText: "Email",
                     labelStyle: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.grey[600],
                     ),
                     floatingLabelStyle: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.orange[900],
                     ),
                     hintText: "Type patient email...",
                     hintStyle: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.grey[400],
                     ),
                   ),
@@ -150,7 +169,7 @@ class MyPatientsView extends GetView<MyPatientsController> {
                   WidgetStatePropertyAll(Colors.grey[200]),
                   elevation: const WidgetStatePropertyAll(4),
                 ),
-                onPressed: () => controller.addPatient(),
+                onPressed: () => controller.assignPatient(),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
