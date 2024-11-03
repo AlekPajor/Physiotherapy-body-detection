@@ -36,8 +36,9 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
   double zoomLevel = 0.0, minZoomLevel = 0.0, maxZoomLevel = 0.0;
   bool _changingCameraLens = false;
   bool _showCustomDialog = true;
-  int _countdown = 0;  // For the countdown
+  int _countdown = 0;
   bool _countdownStarted = false;
+
 
   @override
   void initState() {
@@ -76,6 +77,12 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
         children: [
           _liveFeedBody(),
           if (_showCustomDialog) _buildDialog(context),
+          Obx(() {
+            if (widget.cameraScreenController.activityEnded.value) {
+              return _activityEndedDialog(context);
+            }
+            return SizedBox.shrink(); // Return an empty widget if the dialog is not needed.
+          }),
         ],
       ),
     );
@@ -141,6 +148,76 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
         ],
       ),
     ));
+  }
+
+  Widget _activityEndedDialog(BuildContext context) {
+    return IgnorePointer(
+      ignoring: false,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.8,
+              child: Container(color: Colors.black),
+            ),
+          ),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.grey[900],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Text(
+                      'Activity finished 🎉',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[400]),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Correctness: ${widget.cameraScreenController.correctness!}%",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 40),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.orange[900]),
+                      foregroundColor: WidgetStatePropertyAll(Colors.grey[400]),
+                    ),
+                    onPressed: () {
+                      widget.cameraScreenController.setActivityEnded(false);
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 40),
+                      child: Text(
+                        'OK',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   Widget _buildDialog(BuildContext context) {
@@ -261,9 +338,11 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
         setState(() {
           _showCustomDialog = false;
         });
+        widget.cameraScreenController.startActivity();
         return false;
       }
     });
+
   }
 
   Future _startLiveFeed() async {
@@ -346,6 +425,7 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
         inputImageData: inputImageData
     );
 
+    widget.cameraScreenController.setCurrentImage(inputImage);
     await widget.cameraScreenController.processImage(inputImage);
   }
 }

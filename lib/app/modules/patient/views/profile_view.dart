@@ -197,7 +197,7 @@ class ProfileView extends GetView<ProfileController> {
                                 ),
                                 child: ListTile(
                                   title: Text(
-                                    '${report.activity.exercise.name} - ${report.correctness}',
+                                    '${report.activity.exercise.name} - ${report.correctness}%',
                                     style: TextStyle(color: Colors.grey[300], fontSize: 14),
                                   ),
                                   subtitle: Text(

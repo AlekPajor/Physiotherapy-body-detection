@@ -7,7 +7,8 @@ import 'package:physiotherapy_body_detection/app/data/models/patient.dart';
 import 'package:physiotherapy_body_detection/app/data/models/report.dart';
 
 class HttpController extends GetxController {
-  var baseUrl = "http://192.168.0.13:8080/api";
+  // var baseUrl = "http://192.168.0.13:8080/api";
+  var baseUrl = "http://192.168.100.39:8080/api";
 
   Future<List<Report>> fetchReportsByUserId(int userId) async {
     final response = await http.get(
@@ -97,6 +98,32 @@ class HttpController extends GetxController {
         'duration': duration,
         'startingTime': startingTime,
         'period': period
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return;
+    } else {
+      throw Exception('${response.statusCode}: ${response.body}');
+    }
+  }
+
+  Future<void> sendReport(
+      int patientId,
+      int activityId,
+      String date,
+      String time,
+      int correctness
+  ) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/report/add'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'patientId': patientId,
+        'activityId': activityId,
+        'date': date,
+        'time': time,
+        'correctness': correctness
       }),
     );
 

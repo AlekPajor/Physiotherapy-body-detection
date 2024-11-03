@@ -14,6 +14,7 @@ class CameraView extends GetView<CameraScreenController> {
       customPaint: controller.customPaint.value,
       text: controller.text,
       onImage: (inputImage) {
+        controller.setCurrentImage(inputImage);
         controller.processImage(inputImage);
       },
     );

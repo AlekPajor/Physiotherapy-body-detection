@@ -4,6 +4,7 @@ class Snapshot {
   int? id;
   String time;
   Points points;
+  int? timeInMillis;
 
   Snapshot({
     this.id,
