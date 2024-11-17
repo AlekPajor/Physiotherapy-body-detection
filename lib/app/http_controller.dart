@@ -7,8 +7,8 @@ import 'package:physiotherapy_body_detection/app/data/models/patient.dart';
 import 'package:physiotherapy_body_detection/app/data/models/report.dart';
 
 class HttpController extends GetxController {
-  // var baseUrl = "http://192.168.0.13:8080/api";
-  var baseUrl = "http://192.168.100.39:8080/api";
+  var baseUrl = "http://192.168.0.13:8080/api";
+  // var baseUrl = "http://192.168.100.39:8080/api";
 
   Future<List<Report>> fetchReportsByUserId(int userId) async {
     final response = await http.get(

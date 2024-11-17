@@ -44,4 +44,19 @@ class ProfileController extends GetxController {
     reports.value = await httpController.fetchReportsByUserId(userController.user.value!.id!);
     isLoading.value = false;
   }
+
+  Future<void> fetchPatientDetails() async {
+    try {
+      var fetchedPatient = await httpController.fetchPatientDetails(userController.user.value!.id!);
+      currentActivity.value = fetchedPatient.currentActivity;
+      userController.user.value!.currentActivity = fetchedPatient.currentActivity;
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  Future<void> refetch() async {
+    await fetchPatientDetails();
+    await fetchReports();
+  }
 }

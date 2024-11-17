@@ -15,7 +15,7 @@ class ProfileView extends GetView<ProfileController> {
       backgroundColor: Colors.grey[900],
       body: Obx(() =>
         RefreshIndicator(
-          onRefresh: controller.fetchReports,
+          onRefresh: controller.refetch,
           child: SafeArea(
             minimum: const EdgeInsets.symmetric(horizontal: 20),
             child: SingleChildScrollView(
@@ -30,7 +30,7 @@ class ProfileView extends GetView<ProfileController> {
                         Text(
                           '${controller.userController.user.value?.firstName} ${controller.userController.user.value?.lastName}',
                           style: TextStyle(
-                            fontSize: 32,
+                            fontSize: 30,
                             fontWeight: FontWeight.w700,
                             color: Colors.grey[300],
                           ),
@@ -157,7 +157,7 @@ class ProfileView extends GetView<ProfileController> {
                           ),
                           controller.reports.isEmpty
                           ? Container(
-                            height: MediaQuery.of(context).size.height * 0.4,
+                            height: MediaQuery.of(context).size.height * 0.34,
                             alignment: Alignment.center,
                             child: SizedBox.expand(
                               child: Card(

@@ -7,8 +7,8 @@ import 'package:http/http.dart' as http;
 
 class UserController extends GetxController {
   var user = Rxn<User>();
-  // var baseUrl = "http://192.168.0.13:8080/api";
-  var baseUrl = "http://192.168.100.39:8080/api";
+  var baseUrl = "http://192.168.0.13:8080/api";
+  // var baseUrl = "http://192.168.100.39:8080/api";
 
   bool get isLoggedIn => user.value != null;
 
