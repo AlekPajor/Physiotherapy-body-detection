@@ -88,7 +88,7 @@ class PatientDetailsView extends GetView<PatientDetailsController> {
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
-                                    '${controller.currentActivity.value!.duration}sec - ${controller.currentActivity.value!.startingTime} - ${controller.currentActivity.value!.period} days',
+                                    '${controller.currentActivity.value!.duration}min - ${controller.currentActivity.value!.startingTime} - ${controller.currentActivity.value!.period} days',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey[900],

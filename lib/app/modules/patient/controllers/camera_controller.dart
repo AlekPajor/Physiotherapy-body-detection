@@ -20,8 +20,8 @@ class CameraScreenController extends GetxController {
   UserController userController = Get.find<UserController>();
   final PoseDetector _poseDetector =
   PoseDetector(options: PoseDetectorOptions());
-  bool _canProcess = true;
-  bool _isBusy = false;
+  bool canProcess = true;
+  bool isBusy = false;
   Rx<CustomPaint?> customPaint = Rx<CustomPaint?>(null);
   String? text;
   var currentActivity = Rxn<Activity>();
@@ -48,7 +48,7 @@ class CameraScreenController extends GetxController {
 
   @override
   void onClose() {
-    _canProcess = false;
+    canProcess = false;
     _poseDetector.close();
     super.onClose();
   }
@@ -63,9 +63,9 @@ class CameraScreenController extends GetxController {
   }
 
   Future<void> processImage(InputImage inputImage) async {
-    if (!_canProcess || _isBusy) return;
+    if (!canProcess || isBusy) return;
 
-    _isBusy = true;
+    isBusy = true;
 
     final poses = await _poseDetector.processImage(inputImage);
     if (inputImage.inputImageData?.size != null &&
@@ -80,7 +80,7 @@ class CameraScreenController extends GetxController {
       customPaint.value = null;
     }
 
-    _isBusy = false;
+    isBusy = false;
     update();
   }
 
@@ -88,30 +88,39 @@ class CameraScreenController extends GetxController {
     print("User activity snapshots: " + "${userActivitySnapshots.length}");
     print("Original snapshots: " + "${currentActivity.value?.exercise.snapshots.length}");
 
-    int totalPoints = 0;
-    int maxPoints = userActivitySnapshots.length * 4;
+    double totalError = 0.0;
+    int totalSnapshots = userActivitySnapshots.length;
 
     for (final userSnapshot in userActivitySnapshots) {
-      final activitySnapshot = currentActivity.value?.exercise.snapshots.firstWhere((element) =>
-        element.time == userSnapshot.time,
+      final activitySnapshot = currentActivity.value?.exercise.snapshots.firstWhere(
+            (element) => element.time == userSnapshot.time,
       );
 
-      if ((userSnapshot.points.leftElbow - activitySnapshot!.points.leftElbow).abs() <= 20) {
-        totalPoints += 1;
-      }
-      if ((userSnapshot.points.rightElbow - activitySnapshot.points.rightElbow).abs() <= 20) {
-        totalPoints += 1;
-      }
-      if ((userSnapshot.points.leftKnee - activitySnapshot.points.leftKnee).abs() <= 20) {
-        totalPoints += 1;
-      }
-      if ((userSnapshot.points.rightKnee - activitySnapshot.points.rightKnee).abs() <= 20) {
-        totalPoints += 1;
+      if (activitySnapshot != null) {
+        final leftElbowError = (userSnapshot.points.leftElbow.abs() - activitySnapshot.points.leftElbow.abs()).toDouble();
+        final rightElbowError = (userSnapshot.points.rightElbow.abs() - activitySnapshot.points.rightElbow.abs()).toDouble();
+        final leftKneeError = (userSnapshot.points.leftKnee.abs() - activitySnapshot.points.leftKnee.abs()).toDouble();
+        final rightKneeError = (userSnapshot.points.rightKnee.abs() - activitySnapshot.points.rightKnee.abs()).toDouble();
+
+        totalError += leftElbowError * leftElbowError;
+        totalError += rightElbowError * rightElbowError;
+        totalError += leftKneeError * leftKneeError;
+        totalError += rightKneeError * rightKneeError;
+
+        print("TOTAL ERROR: $totalError");
       }
     }
 
-    int correctnessPercentage = ((totalPoints / maxPoints) * 100).floor();
-    correctness = correctnessPercentage;
+    double mse = totalError / (totalSnapshots * 4);
+    print("MSE: $mse");
+
+    double rmse = sqrt(mse);
+    double normalisedError = (rmse / 180) * 100;
+
+    double correctnessPercentage = 100 - normalisedError;
+    print("CORRECTNESS: $correctnessPercentage");
+
+    correctness = correctnessPercentage.floor();
     print("Activity %%%%%%%%%%%%%%%%%%%%%%%%%% ended");
     print("correctnessPercentage: " + "$correctnessPercentage");
     await sendReport();
