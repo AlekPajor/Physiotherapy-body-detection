@@ -41,7 +41,7 @@ class PatientDetailsView extends GetView<PatientDetailsController> {
                           Text(
                             '${controller.patient.value!.firstName} ${controller.patient.value!.lastName}',
                             style: TextStyle(
-                              fontSize: 32,
+                              fontSize: 30,
                               fontWeight: FontWeight.w700,
                               color: Colors.grey[300],
                             ),
@@ -141,7 +141,7 @@ class PatientDetailsView extends GetView<PatientDetailsController> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 90),
+                  const SizedBox(height: 30),
                   Obx(() {
                     if (controller.isLoading.value) {
                       return Column(

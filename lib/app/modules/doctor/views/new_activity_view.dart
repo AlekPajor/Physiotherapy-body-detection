@@ -107,7 +107,7 @@ class NewActivityView extends GetView<NewActivityController> {
                   SizedBox(
                     width: 70,
                     child: Text(
-                      'sec',
+                      'min',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,

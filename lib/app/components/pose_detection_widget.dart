@@ -30,313 +30,296 @@ class PoseDetectionWidget extends StatefulWidget {
 }
 
 class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
+  bool showCustomDialog = true;
+  bool countdownStarted = false;
+  int countdown = 0;
+  CameraController? cameraController;
   bool liveFeedStarted = false;
-  CameraController? _controller;
-  num _cameraIndex = 0;
-  double zoomLevel = 0.0, minZoomLevel = 0.0, maxZoomLevel = 0.0;
-  bool _changingCameraLens = false;
-  bool _showCustomDialog = true;
-  int _countdown = 0;
-  bool _countdownStarted = false;
-
+  num cameraIndex = 0;
+  bool changingCameraLens = false;
 
   @override
   void initState() {
     super.initState();
 
     if (cameras.any((element) =>
-    element.lensDirection == widget.initialDirection && element.sensorOrientation == 90,
+      element.lensDirection == widget.initialDirection && element.sensorOrientation == 90,
     )) {
-      _cameraIndex = cameras.indexOf(
+      cameraIndex = cameras.indexOf(
         cameras.firstWhere((element) =>
-        element.lensDirection == widget.initialDirection &&
-            element.sensorOrientation == 90),
+          element.lensDirection == widget.initialDirection && element.sensorOrientation == 90
+        ),
       );
     } else {
-      _cameraIndex = cameras.indexOf(cameras.firstWhere(
-              (element) => element.lensDirection == widget.initialDirection),
+      cameraIndex = cameras.indexOf(
+        cameras.firstWhere((element) =>
+          element.lensDirection == widget.initialDirection
+        ),
       );
     }
-
-    _startLiveFeed();
+    startLiveFeed();
   }
 
   @override
   void dispose() {
-    _stopLiveFeed();
+    stopLiveFeed();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: _floatingActionButton(),
+      floatingActionButton: cameras.length == 1
+      ? null
+      : SizedBox(
+          height: 50.0,
+          width: 50.0,
+          child: FloatingActionButton(
+            backgroundColor: Colors.grey[900],
+            onPressed: switchLiveCamera,
+            child: Icon(
+              Platform.isIOS
+                  ? Icons.flip_camera_ios_outlined
+                  : Icons.flip_camera_android_outlined,
+              size: 40,
+              color: Colors.orange[900],
+            ),
+          )
+        ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          _liveFeedBody(),
-          if (_showCustomDialog) _buildDialog(context),
+          (cameraController == null || !cameraController!.value.isInitialized || !liveFeedStarted)
+          ? Container(
+              color: Colors.grey[900],
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.orange[900],
+                ),
+              ),
+            )
+          : Obx(() {
+            final size = MediaQuery.of(context).size;
+            var scale = size.aspectRatio * cameraController!.value.aspectRatio;
+
+            if (scale < 1) scale = 1 / scale;
+
+            return Container(
+              color: Colors.black,
+              child: Stack(
+                fit: StackFit.expand,
+                children: <Widget>[
+                  Transform.scale(
+                    scale: scale,
+                    child: Center(
+                      child: changingCameraLens
+                      ? Center(
+                        child: Text(
+                          'Changing camera lens',
+                          style: TextStyle(color: Colors.grey[400]),
+                        ),
+                      )
+                      : CameraPreview(cameraController!),
+                    ),
+                  ),
+                  if (widget.cameraScreenController.customPaint.value != null)
+                    widget.cameraScreenController.customPaint.value!,
+                ],
+              ),
+            );
+          }),
+          if (showCustomDialog) IgnorePointer(
+            ignoring: false,
+            child: Stack(
+            children: [
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0.8,
+                  child: Container(color: Colors.black),
+                ),
+              ),
+              Center(
+                child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[900],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: widget.cameraScreenController.currentActivity.value != null
+                    ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (!countdownStarted) ...[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 40),
+                            child: Text(
+                              'Start your activity',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[400]),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.cameraScreenController.currentActivity.value!.exercise.name,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[400],
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                '${widget.cameraScreenController.currentActivity.value!.duration}min - ${widget.cameraScreenController.currentActivity.value!.startingTime} - ${widget.cameraScreenController.currentActivity.value!.period} days',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[400],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 40),
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStatePropertyAll(Colors.orange[900]),
+                              foregroundColor: WidgetStatePropertyAll(Colors.grey[400]),
+                            ),
+                            onPressed: () {
+                              startCountdown();
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 40),
+                              child: Text(
+                                'Start',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ] else ...[
+                          Text(
+                            'Starting in $countdown',
+                            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.grey[400]),
+                          ),
+                        ],
+                      ],
+                    )
+                    : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          height: 80,
+                          width: 280,
+                          child: Center(
+                            child: Text(
+                              "No activity assigned",
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[400]),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ),
+                ),
+              ],
+            ),
+          ),
           Obx(() {
             if (widget.cameraScreenController.activityEnded.value) {
-              return _activityEndedDialog(context);
+              return IgnorePointer(
+                ignoring: false,
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Opacity(
+                        opacity: 0.8,
+                        child: Container(color: Colors.black),
+                      ),
+                    ),
+                    Center(
+                      child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[900],
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 40),
+                                child: Text(
+                                  'Activity finished 🎉',
+                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[400]),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Correctness: ${widget.cameraScreenController.correctness!}%",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[400],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 40),
+                              ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStatePropertyAll(Colors.orange[900]),
+                                  foregroundColor: WidgetStatePropertyAll(Colors.grey[400]),
+                                ),
+                                onPressed: () {
+                                  widget.cameraScreenController.setActivityEnded(false);
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 40),
+                                  child: Text(
+                                    'OK',
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                      ),
+                    )
+                  ],
+                ),
+              );
             }
-            return SizedBox.shrink(); // Return an empty widget if the dialog is not needed.
+            return SizedBox.shrink();
           }),
         ],
       ),
     );
   }
 
-  Widget? _floatingActionButton() {
-    if (cameras.length == 1) return null;
-    return SizedBox(
-        height: 50.0,
-        width: 50.0,
-        child: FloatingActionButton(
-          backgroundColor: Colors.grey[900],
-          onPressed: _switchLiveCamera,
-          child: Icon(
-            Platform.isIOS
-                ? Icons.flip_camera_ios_outlined
-                : Icons.flip_camera_android_outlined,
-            size: 40,
-            color: Colors.orange[900],
-          ),
-        )
-    );
-  }
-
-
-  Widget _liveFeedBody() {
-    if (_controller == null || !_controller!.value.isInitialized || !liveFeedStarted) {
-      return Container(
-        color: Colors.grey[900],
-        child: Center(
-          child: CircularProgressIndicator(
-            color: Colors.orange[900],
-          ),
-        ),
-      );
-    }
-
-    final size = MediaQuery.of(context).size;
-    var scale = size.aspectRatio * _controller!.value.aspectRatio;
-
-    if (scale < 1) scale = 1 / scale;
-
-    return Obx(() => Container(
-      color: Colors.black,
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Transform.scale(
-            scale: scale,
-            child: Center(
-              child: _changingCameraLens
-                ? Center(
-                    child: Text(
-                      'Changing camera lens',
-                      style: TextStyle(color: Colors.grey[400]),
-                    ),
-                  )
-                : CameraPreview(_controller!),
-            ),
-          ),
-          if (widget.cameraScreenController.customPaint.value != null)
-            widget.cameraScreenController.customPaint.value!,
-        ],
-      ),
-    ));
-  }
-
-  Widget _activityEndedDialog(BuildContext context) {
-    return IgnorePointer(
-      ignoring: false,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.8,
-              child: Container(color: Colors.black),
-            ),
-          ),
-          Center(
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.grey[900],
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: Text(
-                      'Activity finished 🎉',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[400]),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Correctness: ${widget.cameraScreenController.correctness!}%",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(Colors.orange[900]),
-                      foregroundColor: WidgetStatePropertyAll(Colors.grey[400]),
-                    ),
-                    onPressed: () {
-                      widget.cameraScreenController.setActivityEnded(false);
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 40),
-                      child: Text(
-                        'OK',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDialog(BuildContext context) {
-    return IgnorePointer(
-      ignoring: false,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.8,
-              child: Container(color: Colors.black),
-            ),
-          ),
-          Center(
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.grey[900],
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: widget.cameraScreenController.currentActivity.value != null
-              ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (!_countdownStarted) ...[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40),
-                      child: Text(
-                        'Start your activity',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[400]),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.cameraScreenController.currentActivity.value!.exercise.name,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[400],
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          '${widget.cameraScreenController.currentActivity.value!.duration}min - ${widget.cameraScreenController.currentActivity.value!.startingTime} - ${widget.cameraScreenController.currentActivity.value!.period} days',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[400],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 40),
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(Colors.orange[900]),
-                        foregroundColor: WidgetStatePropertyAll(Colors.grey[400]),
-                      ),
-                      onPressed: () {
-                        _startCountdown();
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 40),
-                        child: Text(
-                          'Start',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ] else ...[
-                    Text(
-                      'Starting in $_countdown',
-                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.grey[400]),
-                    ),
-                  ],
-                ],
-              )
-              : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    height: 80,
-                    width: 280,
-                    child: Center(
-                      child: Text(
-                        "No activity assigned",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[400]),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _startCountdown() {
+  void startCountdown() {
     setState(() {
-      _countdown = 5;
-      _countdownStarted = true;
+      countdown = 5;
+      countdownStarted = true;
     });
 
     Future.doWhile(() async {
-      if (_countdown > 0) {
+      if (countdown > 0) {
         await Future.delayed(const Duration(seconds: 1));
         setState(() {
-          _countdown--;
+          countdown--;
         });
         return true;
       } else {
         setState(() {
-          _showCustomDialog = false;
+          showCustomDialog = false;
         });
         widget.cameraScreenController.startActivity();
         return false;
@@ -345,47 +328,40 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
 
   }
 
-  Future _startLiveFeed() async {
+  Future startLiveFeed() async {
     var cameras = await availableCameras();
-    final camera = cameras[_cameraIndex.toInt()];
-    _controller = CameraController(
+    final camera = cameras[cameraIndex.toInt()];
+    cameraController = CameraController(
       camera,
       ResolutionPreset.high,
       enableAudio: false,
     );
-    _controller?.initialize().then((_) {
+    cameraController?.initialize().then((_) {
       if (!mounted) {
         return;
       }
-      _controller?.getMinZoomLevel().then((value) {
-        zoomLevel = value;
-        minZoomLevel = value;
-      });
-      _controller?.getMaxZoomLevel().then((value) {
-        maxZoomLevel = value;
-      });
-      _controller?.startImageStream(_processCameraImage);
+      cameraController?.startImageStream(processCameraImage);
       setState(() {});
     });
     liveFeedStarted = true;
   }
 
-  Future _stopLiveFeed() async {
-    await _controller?.stopImageStream();
-    await _controller?.dispose();
-    _controller = null;
+  Future stopLiveFeed() async {
+    await cameraController?.stopImageStream();
+    await cameraController?.dispose();
+    cameraController = null;
   }
 
-  Future _switchLiveCamera() async {
-    setState(() => _changingCameraLens = true);
-    _cameraIndex = (_cameraIndex + 1) % cameras.length;
+  Future switchLiveCamera() async {
+    setState(() => changingCameraLens = true);
+    cameraIndex = (cameraIndex + 1) % cameras.length;
 
-    await _stopLiveFeed();
-    await _startLiveFeed();
-    setState(() => _changingCameraLens = false);
+    await stopLiveFeed();
+    await startLiveFeed();
+    setState(() => changingCameraLens = false);
   }
 
-  Future _processCameraImage(CameraImage image) async {
+  Future processCameraImage(CameraImage image) async {
     final WriteBuffer allBytes = WriteBuffer();
     for (final Plane plane in image.planes) {
       allBytes.putUint8List(plane.bytes);
@@ -394,7 +370,7 @@ class _PoseDetectionWidgetState extends State<PoseDetectionWidget> {
 
     final Size imageSize = Size(image.width.toDouble(), image.height.toDouble());
 
-    final camera = cameras[_cameraIndex.toInt()];
+    final camera = cameras[cameraIndex.toInt()];
     final imageRotation =
     InputImageRotationValue.fromRawValue(camera.sensorOrientation);
     if (imageRotation == null) return;

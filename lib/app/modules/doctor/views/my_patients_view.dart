@@ -78,7 +78,7 @@ class MyPatientsView extends GetView<MyPatientsController> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey[900],
-                                fontSize: 16
+                                fontSize: 14
                               ),
                             ),
                             subtitle: Text(
