@@ -92,8 +92,8 @@ class CameraScreenController extends GetxController {
     int totalSnapshots = userActivitySnapshots.length;
 
     for (final userSnapshot in userActivitySnapshots) {
-      final activitySnapshot = currentActivity.value?.exercise.snapshots.firstWhere(
-            (element) => element.time == userSnapshot.time,
+      final activitySnapshot = currentActivity.value?.exercise.snapshots.firstWhere((element) =>
+        element.time == userSnapshot.time,
       );
 
       if (activitySnapshot != null) {
