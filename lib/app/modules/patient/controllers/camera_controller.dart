@@ -111,11 +111,23 @@ class CameraScreenController extends GetxController {
       }
     }
 
+    final allValues = currentActivity.value?.exercise.snapshots.expand((obj) => [
+      obj.points.leftElbow,
+      obj.points.rightElbow,
+      obj.points.leftKnee,
+      obj.points.rightKnee,
+    ]);
+
+    final smallestValue = allValues!.reduce((a, b) => a < b ? a : b);
+    final largestValue = allValues.reduce((a, b) => a > b ? a : b);
+    print('Smallest value: $smallestValue');
+    print('Largest value: $largestValue');
+
     double mse = totalError / (totalSnapshots * 4);
     print("MSE: $mse");
 
     double rmse = sqrt(mse);
-    double normalisedError = (rmse / 180) * 100;
+    double normalisedError = (rmse / (largestValue - smallestValue)) * 100;
 
     double correctnessPercentage = 100 - normalisedError;
     print("CORRECTNESS: $correctnessPercentage");
